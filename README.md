@@ -19,7 +19,7 @@ Written architecture (300-400 words) for the end-to-end integration: landing pag
 ---
 
 ## Live page
-[To be added after Vercel deployment]
+https://namoza-orthonow-assignment.vercel.app/
 
 ## PageSpeed screenshot
 [To be added — task2-landing-page/pagespeed-screenshot.png]
