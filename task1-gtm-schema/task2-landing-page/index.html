@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book an Orthopaedic Consultation in Bengaluru | OrthoNow</title>
+<meta name="description" content="Expert orthopaedic opinion for knee and back pain. 9 clinics across Bengaluru, Hyderabad, Chennai. Book your consultation today.">
+
+<!--
+  ARCHITECTURE NOTES (for the dev reading this in 5 minutes):
+  - Single file, zero external dependencies. No web fonts, no icon libraries, no images.
+  - All visual elements (logo mark, icons, trust badges) are inline SVG or CSS - this is
+    the main lever for the 90+ mobile PageSpeed score: zero network requests beyond
+    the HTML document itself.
+  - CSS is in <style> in <head> (no render-blocking external stylesheet).
+  - JS is a single <script> at the end of <body>, deferred by position - no async/defer
+    needed since there's nothing else to block.
+  - The dataLayer push fires ONLY inside the form's submit handler, after client-side
+    validation passes. It does not fire on page load - that's checked explicitly below.
+-->
+
+<style>
+  :root {
+    --navy: #0A0F2C;
+    --navy-light: #161d4a;
+    --gold: #C9A84C;
+    --gold-light: #e0c878;
+    --off-white: #F7F5F0;
+    --text-muted: #8a8fa3;
+    --error: #d14343;
+    --success: #2f9e58;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--off-white);
+    color: var(--navy);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  /* ---------- HEADER ---------- */
+  header {
+    background: var(--navy);
+    padding: 16px 0;
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-mark {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .logo-mark svg { width: 18px; height: 18px; }
+
+  .logo-text {
+    color: #fff;
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: 0.3px;
+  }
+
+  .logo-text span { color: var(--gold); }
+
+  .header-phone {
+    margin-left: auto;
+    color: var(--gold);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid rgba(201,168,76,0.4);
+    padding: 7px 12px;
+    border-radius: 6px;
+  }
+
+  /* ---------- HERO ---------- */
+  .hero {
+    background: var(--navy);
+    background: linear-gradient(180deg, var(--navy) 0%, var(--navy-light) 100%);
+    padding: 36px 0 32px;
+    color: #fff;
+  }
+
+  .eyebrow {
+    color: var(--gold);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .eyebrow::before {
+    content: "";
+    width: 18px;
+    height: 2px;
+    background: var(--gold);
+    display: inline-block;
+  }
+
+  h1 {
+    font-size: 28px;
+    line-height: 1.25;
+    font-weight: 700;
+    margin-bottom: 12px;
+    letter-spacing: -0.3px;
+  }
+
+  .subhead {
+    font-size: 15.5px;
+    color: #c5c9dc;
+    margin-bottom: 22px;
+    max-width: 42ch;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 22px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+  }
+
+  .stat-num {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1.1;
+  }
+
+  .stat-label {
+    font-size: 11.5px;
+    color: #9ba0b8;
+    margin-top: 2px;
+  }
+
+  /* ---------- FORM CARD ---------- */
+  .form-section {
+    padding: 24px 0 8px;
+  }
+
+  .form-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 22px 20px 20px;
+    box-shadow: 0 6px 28px rgba(10,15,44,0.12);
+    margin-top: -54px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .form-title {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 3px;
+  }
+
+  .form-subtitle {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 18px;
+  }
+
+  .field-group { margin-bottom: 14px; }
+
+  label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+
+  input[type="text"],
+  input[type="tel"] {
+    width: 100%;
+    padding: 13px 14px;
+    font-size: 16px; /* 16px prevents iOS auto-zoom on focus */
+    border: 1.5px solid #e2e1da;
+    border-radius: 8px;
+    background: #fcfcfa;
+    color: var(--navy);
+    font-family: inherit;
+  }
+
+  input[type="text"]:focus,
+  input[type="tel"]:focus {
+    outline: none;
+    border-color: var(--gold);
+    background: #fff;
+  }
+
+  input.field-error {
+    border-color: var(--error);
+  }
+
+  .error-msg {
+    font-size: 12px;
+    color: var(--error);
+    margin-top: 5px;
+    display: none;
+  }
+
+  .error-msg.visible { display: block; }
+
+  .cta-btn {
+    width: 100%;
+    background: var(--gold);
+    color: var(--navy);
+    border: none;
+    padding: 15px 16px;
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 4px;
+    font-family: inherit;
+    transition: background-color 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .cta-btn:active { background: var(--gold-light); }
+
+  .form-note {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: 12px;
+  }
+
+  /* ---------- THANK YOU STATE ---------- */
+  .thankyou {
+    display: none;
+    text-align: center;
+    padding: 18px 4px 10px;
+  }
+
+  .thankyou.visible { display: block; }
+  .form-card.is-submitted .form-default { display: none; }
+
+  .ty-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #eaf6ee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 14px;
+  }
+
+  .ty-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .ty-text {
+    font-size: 13.5px;
+    color: var(--text-muted);
+    max-width: 32ch;
+    margin: 0 auto;
+  }
+
+  /* ---------- TRUST SECTION ---------- */
+  .trust-section {
+    padding: 26px 0 30px;
+  }
+
+  .trust-heading {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  .trust-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+  }
+
+  .trust-card {
+    background: #fff;
+    border: 1px solid #ece9e0;
+    border-radius: 10px;
+    padding: 14px 8px;
+    text-align: center;
+  }
+
+  .trust-icon {
+    width: 26px;
+    height: 26px;
+    margin: 0 auto 8px;
+    color: var(--gold);
+  }
+
+  .trust-num {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.1;
+  }
+
+  .trust-label {
+    font-size: 10.5px;
+    color: var(--text-muted);
+    margin-top: 3px;
+    line-height: 1.3;
+  }
+
+  /* ---------- FOOTER ---------- */
+  footer {
+    background: var(--navy);
+    padding: 18px 0;
+    text-align: center;
+  }
+
+  footer p {
+    color: #6e7390;
+    font-size: 11px;
+  }
+
+  @media (min-width: 540px) {
+    .container { max-width: 560px; }
+    h1 { font-size: 32px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container header-inner">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L3 7v6c0 5 4 8.5 9 9 5-.5 9-4 9-9V7l-9-5z" fill="#0A0F2C"/>
+      </svg>
+    </div>
+    <span class="logo-text">Ortho<span>Now</span></span>
+    <a href="tel:+918041234567" class="header-phone" id="headerCallBtn">Call Now</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <p class="eyebrow">Orthopaedic Care · Bengaluru</p>
+    <h1>Knee or back pain slowing you down? Get an expert opinion.</h1>
+    <p class="subhead">Same-week appointments with orthopaedic specialists. No referral needed — just book and walk in.</p>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num">9</div>
+        <div class="stat-label">Clinics, 3 cities</div>
+      </div>
+      <div>
+        <div class="stat-num">15+ yrs</div>
+        <div class="stat-label">Avg. specialist experience</div>
+      </div>
+      <div>
+        <div class="stat-num">Same week</div>
+        <div class="stat-label">Appointment availability</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="form-section">
+  <div class="container">
+    <div class="form-card" id="formCard">
+
+      <div class="form-default" id="formDefault">
+        <h2 class="form-title">Book your consultation</h2>
+        <p class="form-subtitle">Takes 20 seconds. Our team calls you back to confirm a slot.</p>
+
+        <form id="consultForm" novalidate>
+          <div class="field-group">
+            <label for="patientName">Full name</label>
+            <input type="text" id="patientName" name="name" placeholder="e.g. Rahul Mehta" autocomplete="name">
+            <p class="error-msg" id="nameError">Please enter your name</p>
+          </div>
+
+          <div class="field-group">
+            <label for="patientPhone">Phone number</label>
+            <input type="tel" id="patientPhone" name="phone" placeholder="10-digit mobile number" autocomplete="tel" inputmode="numeric" maxlength="10">
+            <p class="error-msg" id="phoneError">Please enter a valid 10-digit number</p>
+          </div>
+
+          <button type="submit" class="cta-btn" id="submitBtn">Book My Consultation</button>
+          <p class="form-note">We'll call within 30 minutes to confirm your slot &amp; clinic.</p>
+        </form>
+      </div>
+
+      <div class="thankyou" id="thankYou">
+        <div class="ty-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+            <path d="M5 13l4 4L19 7" stroke="#2f9e58" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <p class="ty-title">Request received</p>
+        <p class="ty-text">Our care coordinator will call <span id="tyName">you</span> within 30 minutes to confirm your nearest clinic and slot.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="trust-section">
+  <div class="container">
+    <p class="trust-heading">Why patients choose OrthoNow</p>
+    <div class="trust-grid">
+      <div class="trust-card">
+        <svg class="trust-icon" viewBox="0 0 24 24" fill="none"><path d="M12 21s-7-4.5-9.5-9C0.5 8 2 4 6 4c2 0 3.5 1 4 2.5C10.5 5 12 4 14 4c4 0 5.5 4 3.5 8-2.5 4.5-9.5 9-9.5 9z" stroke="currentColor" stroke-width="1.6"/></svg>
+        <div class="trust-num">9 Clinics</div>
+        <div class="trust-label">Bengaluru, Hyderabad, Chennai</div>
+      </div>
+      <div class="trust-card">
+        <svg class="trust-icon" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.5 6.5L21 9l-5 4.5L17.5 21 12 17l-5.5 4L8 13.5 3 9l6.5-.5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        <div class="trust-num">Specialist-led</div>
+        <div class="trust-label">Every consult reviewed by an orthopaedic surgeon</div>
+      </div>
+      <div class="trust-card">
+        <svg class="trust-icon" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3.5 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <div class="trust-num">Same week</div>
+        <div class="trust-label">Typical appointment availability</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>OrthoNow Orthopaedic Clinics · Bengaluru · Hyderabad · Chennai</p>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  // Ensure dataLayer exists - standard GTM bootstrap.
+  // NOTE: this line only initialises the array if absent. It does NOT push
+  // any event itself. The first real push happens inside handleSubmit(),
+  // triggered exclusively by the form's submit event.
+  window.dataLayer = window.dataLayer || [];
+
+  var form = document.getElementById("consultForm");
+  var nameInput = document.getElementById("patientName");
+  var phoneInput = document.getElementById("patientPhone");
+  var nameError = document.getElementById("nameError");
+  var phoneError = document.getElementById("phoneError");
+  var formCard = document.getElementById("formCard");
+  var formDefault = document.getElementById("formDefault");
+  var thankYou = document.getElementById("thankYou");
+  var tyName = document.getElementById("tyName");
+  var submitBtn = document.getElementById("submitBtn");
+
+  // Only allow digits in the phone field as the user types.
+  phoneInput.addEventListener("input", function () {
+    phoneInput.value = phoneInput.value.replace(/\D/g, "").slice(0, 10);
+  });
+
+  function validate() {
+    var valid = true;
+
+    var nameVal = nameInput.value.trim();
+    if (nameVal.length < 2) {
+      nameInput.classList.add("field-error");
+      nameError.classList.add("visible");
+      valid = false;
+    } else {
+      nameInput.classList.remove("field-error");
+      nameError.classList.remove("visible");
+    }
+
+    var phoneVal = phoneInput.value.trim();
+    var phoneValid = /^[6-9]\d{9}$/.test(phoneVal); // Indian mobile pattern
+    if (!phoneValid) {
+      phoneInput.classList.add("field-error");
+      phoneError.classList.add("visible");
+      valid = false;
+    } else {
+      phoneInput.classList.remove("field-error");
+      phoneError.classList.remove("visible");
+    }
+
+    return valid;
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault(); // no page reload, no native GET/POST navigation
+
+    if (!validate()) return;
+
+    var nameVal = nameInput.value.trim();
+    var phoneVal = phoneInput.value.trim();
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Submitting...";
+
+    // ---- THE DATALAYER PUSH ----
+    // Fires once, only here, only after validation passes on user-initiated submit.
+    // Parameters beyond the minimum 2 are included because the GTM schema (Task 1)
+    // defines this event feeding a GA4 conversion + Google Ads import, and those
+    // need clinic-attribution and lead-source context to be useful downstream.
+    window.dataLayer.push({
+      event: "consultation_form_submitted",
+      form_name: "ortho_consultation_landing",
+      lead_source: "Google Ads - Consultation Landing Page",
+      patient_phone_provided: true,
+      page_path: window.location.pathname
+    });
+
+    // Simulate the network call to the backend/CRM hook described in Task 3.
+    // In production this would be an actual fetch() to the form-handling
+    // endpoint (or a HubSpot Forms API call) - mocked here since this file
+    // has no server.
+    setTimeout(function () {
+      tyName.textContent = nameVal.split(" ")[0];
+      formCard.classList.add("is-submitted");
+      thankYou.classList.add("visible");
+    }, 350);
+  }
+
+  form.addEventListener("submit", handleSubmit);
+
+  // Call-button click tracking (referenced in Task 1 schema as `call_now_click`).
+  document.getElementById("headerCallBtn").addEventListener("click", function () {
+    window.dataLayer.push({
+      event: "call_now_click",
+      call_location: "header",
+      page_path: window.location.pathname
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
