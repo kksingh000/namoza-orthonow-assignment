@@ -22,4 +22,4 @@ Written architecture (300-400 words) for the end-to-end integration: landing pag
 https://namoza-orthonow-assignment.vercel.app/
 
 ## PageSpeed screenshot
-[To be added — task2-landing-page/pagespeed-screenshot.png]
+See task2-landing-page/ folder for PageSpeed screenshots (100 Performance, 89 Accessibility, 100 Best Practices, 100 SEO on Mobile).
